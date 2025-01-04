@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %} {% endblock %}
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+   
+</head>
+<style>
+    @keyframes gradient-animation {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Применяем анимацию к кнопке */
+    .hover\:gradient-animation:hover {
+        animation: gradient-animation 5s ease infinite;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    body {
+        font-family: 'Helvetica', sans-serif;
+      }
+</style>
+
+<body class='bg-black text-white h-screen max-h-screen'>
+    <header class="p-5 flex items-center justify-between h-16">
+        <div>
+            <!-- logo -->
+            <a href="{% url 'index' %}" class="w-10 flex items-start space-x-1 hover:text-gray-200">
+                <img src="{% static 'svg/logo.svg' %}" alt="">
+                <p class="font-serif">Veritas Nuntia</p>
+            </a>
+        </div>
+        <div class="flex items-center space-x-3">
+            {% if user.is_authenticated %}
+            <a href="{% url 'users:profile' user.pk %}" class="flex items-center space-x-1">
+                {% if user.photo %}
+                <p class="rounded-xl overflow-hidden w-8 h-8"><img src="{{user.photo.url}}"
+                        class="w-full h-full object-cover"></p>
+                {% endif %}
+                <p class=" font-extralight">{{ user.username }} -</p>
+                <p><img src="{% static 'svg/star.svg' %}" alt="" class="w-4 opacity-70"></p>
+                <p>{{user.rating}}</p>
+            </a>
+                {% include 'includes/notification.html' %}
+                {% include 'includes/ai_write_button.html' %}
+                {% include 'includes/opinion.html' %}
+            <a href="{% url 'users:subscriptions' %}"
+                class="bg-white font-light hover:scale-95 hover:bg-gray-200 text-black p-2 rounded">Подписки</a>
+            <form action="{% url 'users:logout' %}" method="post"
+                class="bg-red-600 hover:bg-red-700 text-white p-2 rounded hover:scale-95">
+                {% csrf_token %}
+                <button class="flex items-center justify-center">
+                    <img src="{% static 'svg/logout.svg' %}" alt="" class="w-6">
+                </button>
+            </form>
+            {% else %}
+            <a href="{% url 'users:login' %}"
+                class="hover:bg-gray-400 hover:opacity-50 transition-opacity duration-300 p-3 rounded-xl">Вход</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        {% block main %}
+        {% endblock %}
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% load template_filters %}
+{% block title %}Главная страница{% endblock title %}
+{% block main %}
+
+    <div class="grid {% if user.is_authenticated %}grid-cols-2 {% endif %} m-5 gap-2">
+        <div>
+            <!-- left panel -->
+            <div class="space-y-3 overflow-scroll no-scrollbar h-[calc(100vh-6rem)]">
+                {% for obj in object_list %}
+                    {% include "includes/article_cards/article_for_index.html" %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+            <!-- right panel -->
+            <div class="flex flex-col justify-between h-[calc(100vh-6rem)]">
+                <div>
+                    {% include "includes/user_find.html" %}
+
+                    <div class="space-y-3 overflow-scroll no-scrollbar h-[calc(100vh-19rem)]">
+                        {% if user_articles %}
+                            <p class="font-light mt-2">МОИ СООБЩЕНИЯ</p>
+                            {% for a in user_articles %}
+                                {% include "includes/article_cards/article_for_panel.html" %}
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center text-gray-300 opacity-50">НАПИШИТЕ ВАШЕ ПЕРВОЕ СООБЩЕНИЕ МИРУ</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <form action="{% url 'articles:create_article' %}" method="post" enctype="multipart/form-data"
+                      class="text-center flex flex-col justify-center items-center rounded-xl mx-auto p-1 w-full">
+                    {% csrf_token %}
+                    <p class="w-full relative">{{ form.body }} <span id="charCount" class="absolute right-0 bottom-0 m-2 text-gray-500">300</span> </p>
+                    <div class="grid grid-cols-12 gap-2 w-full">
+                        <button type="submit"
+                                class="bg-white text-black p-1 rounded hover:scale-95 w-full col-span-11">Написать
+                        </button>
+                        <label for="fileinput"
+                               class="rounded-3xl bg-blue-600 w-9 h-9 flex justify-center items-center hover:scale-95 hover:bg-blue-700 cursor-pointer">
+                            <img src="{% static 'svg/image.svg' %}" alt="" class="w-8">
+                            {{ form.photo }}
+                        </label>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        var textarea = $('#textArea')
+        var maxLength = parseInt(textarea.attr('maxlength'))
+        var charCount = $('#charCount')
+        textarea.on('input', function (){
+            charCount.text(maxLength - $(this).val().length)
+        })
+    })
+    </script>
+{% endblock %}

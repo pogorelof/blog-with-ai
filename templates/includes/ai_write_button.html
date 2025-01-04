@@ -1,0 +1,35 @@
+{% load static %}
+
+<div>
+    <a
+            {% if perms.users.ai_write %}
+                href=""
+            {% endif %}
+        id="write_button"
+        class="block {% if perms.users.ai_write %} bg-white hover:bg-purple-900  {% else %} bg-gray-400 hover:bg-red-900  {% endif %}hover:scale-95 hover:cursor-pointer text-black p-2 rounded-full">
+        <img src="{% static 'svg/ai_write.svg' %}" alt="" class="w-5 h-5">
+    </a>
+    <div id="write_message" class="hidden absolute z-10 bg-gray-50 p-1 mt-1 rounded-lg text-xs text-gray-800 opacity-95">
+        <p class="bold text-md">ИИ Помощник</p>
+        <p>Данный ИИ помощник поможет вам в написании текста.</p>
+        <p>Для получения доступа нужно соответствовать следующим требованиям:</p>
+        <p>- иметь суммарный рейтинг 4.0</p>
+        <p>- написать минимум 10 статей</p>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    {% if not perms.users.ai_write %}
+    $(document).ready(function (){
+        $('#write_button').on('mousedown', function (){
+            $('#write_message').removeClass('hidden')
+        })
+        
+        $(document).on('click', function (e){
+            if(!$(e.target).closest('#write_button, #write_message').length){
+                $('#write_message').addClass('hidden')
+            }
+        })
+    })
+    {% endif %}
+</script>

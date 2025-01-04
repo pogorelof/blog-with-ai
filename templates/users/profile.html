@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% load template_filters %}
+{% block title %}Профиль{% endblock title %}
+{% block main %}
+<div class="text-black bg-white rounded-lg p-3 m-5 space-y-3">
+    <div class="flex justify-between items-center ">
+        <div>
+            {% if object.photo %}
+            <div class="rounded-lg overflow-hidden w-14 h-14"><img src="{{object.photo.url}}"
+                    class="w-full h-full object-cover"></div>
+            {% endif %}
+        </div>
+        <p class="text-xl font-medium">{{ object.username }}</p>
+        <p class="text-md text-gray-400 opacity-70">
+            {{object.last_activity}}
+        </p>
+    </div>
+    <div class="flex items-center justify-between">
+        <div class="text-md text-gray-900 opacity-100 leading-none">
+            <p class="text-center font-medium">{{ object.subscribers.count }}</p>
+            <p class="text-sm">Подписки</p>
+        </div>
+        <div class="text-lg text-gray-900 opacity-100 leading-none">
+            <p class="text-center font-medium">{{ object.followers.count }}</p>
+            <p class="text-sm">Подписчики</p>
+        </div>
+        {% if object.pk != user.pk %}
+        {% if is_subscribe %}
+        <a href="{% url 'users:unsubscribe' object.pk %}" class="bg-black hover:scale-95 p-2 text-white rounded-full
+        bg-gradient-to-r from-gray-500 via-gray-900 to-gray-500 
+        bg-[length:400%_400%] 
+        transition-all 
+        duration-1000 
+        ease-in-out
+        hover:gradient-animation
+        ">
+            Отписаться
+        </a>
+        {% else %}
+        <a href="{% url 'users:subscribe' object.pk %}" class="bg-black hover:scale-95 p-2 text-white rounded-lg
+        bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500 
+        bg-[length:400%_400%] 
+        transition-all 
+        duration-1000 
+        ease-in-out
+        hover:gradient-animation
+        ">
+            Подписаться
+        </a>
+        {% endif %}
+        {% else %}
+            <a href="{% url 'users:edit' %}" class="block text-white bg-black hover:bg-gray-900 hover:scale-95 p-2 rounded w-fit">Редактировать</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class='m-5 space-y-3 overflow-scroll no-scrollbar h-[calc(100vh-12rem)]'>
+    {% for a in object.articles.all %}
+    {% include "includes/article_cards/article_for_panel.html" %}
+    {% endfor %}
+</div>
+
+{% endblock main %}

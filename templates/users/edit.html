@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %} Редактирование профиля {% endblock %}
+{% block main %}
+
+    <div class="p-3 bg-white rounded-xl w-1/2 mx-auto text-black">
+        <div class="flex items-center justify-between">
+            <div class="w-32 h-32">
+                <img src="{{ request.user.photo.url }}" class="w-full h-full object-cover">
+            </div>
+            <form action="{% url 'users:change_photo' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="new_photo" class="file:bg-gray-100 hover:file:bg-gray-200 file:cursor-pointer file:border-none file:rounded-lg file:p-2 border border-1 border-white rounded-xl bg-white">
+                <button type="submit" class="p-2 rounded-lg bg-gray-200 hover:bg-gray-300">Сменить фото</button>
+            </form>
+        </div>
+    
+        <div>
+            <p class="text-center text-xl font-medium">Изменение пароль</p>
+            <div>
+                {% for message in messages %}
+                    <p class="{% if message.tags == 'error' %} bg-red-500 {% else %} bg-green-500 {% endif %} p-1 bg-opacity-90 rounded text-gray-50 text-sm text-center">
+                    {{ message }}
+                    </p>
+                {% endfor %}
+            </div>
+            <form action="{% url 'users:change_password' %}" method="post" class="w-11/12 mx-auto mt-2 space-y-2">
+                {% csrf_token %}
+                <p class="space-x-3 grid grid-cols-2 items-center">
+                    <label for="" class="whitespace-nowrap">Старый пароль</label>
+                    <input type="password" name="old_pass" class="bg-gray-100 w-full rounded p-1">
+                </p>
+                
+                <p class="grid grid-cols-2 space-x-3 items-center">
+                    <label for="" class="whitespace-nowrap">Новый пароль</label>
+                    <input type="password" name="new_pass" class="bg-gray-100 w-full rounded p-1">
+                </p>
+                
+                <p class="grid grid-cols-2 space-x-3 items-center">
+                    <label for="" class="whitespace-nowrap">Повторите новый пароль</label>
+                    <input type="password" name="repeat_pass" class="bg-gray-100 w-full rounded p-1">
+                </p>
+                
+                <p class="text-center">
+                    <button class="bg-black rounded p-2 text-white hover:bg-gray-900">Изменить пароль</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    
+{% endblock %}

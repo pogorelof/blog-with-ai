@@ -1,0 +1,57 @@
+<div class="group relative">
+    <form id="search-form" class="text-black">
+        <input id="username" type="text" class="w-full rounded-full p-3 outline-none" placeholder="Найти пользователя">
+    </form>
+    <div id="user-list" class="hidden absolute bg-white opacity-0 z-10 p-3 m-3 rounded w-full space-y-1">
+
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#username').on('focus', function(){
+            $('#user-list').removeClass('hidden')
+        })
+
+        $('#username').on('blur', function(){
+            setTimeout(function(){
+                $('#user-list').addClass('hidden')
+            }, 100)
+        })
+
+        $('#username').on('input', function (event) {
+            event.preventDefault()
+            var username = $('#username').val()
+
+            $.ajax({
+                url: "{% url 'users:search' %}",
+                data: { 'username': username },
+                dataType: 'json',
+                success: function (response) {
+                    $('#user-list').empty()
+
+                    if (response.users.length > 0) {
+                        $('#user-list').removeClass('opacity-0')
+                        response.users.forEach(function (user) {
+                            var userDiv = `
+                            <a href='users/profile/${user.id}' class="hover:bg-gray-900 bg-black text-white p-3 rounded-lg flex items-center justify-between">
+                                <div id="photo">
+                                    <div class="rounded-lg overflow-hidden w-10 h-10"><img src="${user.photo_url}"
+                                            class="w-full h-full object-cover"></div>
+                                </div>
+                                <p class='mx-5 font-medium'>${user.username}</p>
+                            </a>
+                            `
+                            $('#user-list').append(userDiv)
+                        })
+                    }else{
+                        $('#user-list').addClass('opacity-0')
+                    }
+                }
+            })
+        })
+    })
+
+</script>

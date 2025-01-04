@@ -1,0 +1,47 @@
+{% load static %}
+{% load template_filters %}
+
+
+<div class="relative bg-white rounded-lg text-black p-3">
+    {% if user == a.author %}
+    <a href="{% url 'articles:delete_article' a.pk %}"
+        class="absolute right-0 top-0 bg-black hover:bg-red-700 hover:scale-95 cursor-pointer rounded-xl p-1 m-1">
+        <img src="{% static 'svg/trash.svg' %}" class="w-5">
+    </a>
+    {% endif %}
+
+    <a href='{% url 'users:profile' a.author.pk %}' class="flex items-center space-x-1">
+        {% if a.author.photo %}
+        <div class="rounded-lg overflow-hidden w-6 h-6"><img src="{{a.author.photo.url}}"
+                class="w-full h-full object-cover"></div>
+        {% endif %}
+        <p class="text-sm font-light">{{a.author.username}} - </p>
+        <p class="text-sm font-light">{{a.upload_at|date:'d.m H:i'}}</p>
+    </a>
+
+    <a href="{% url 'articles:detail_article' a.pk %}"
+        class="block m-3 {% if a.photo %} grid grid-cols-2 {% endif %} gap-3">
+        <p>{{a.body}}</p>
+        {% if a.photo %}
+        <div class="rounded-xl overflow-hidden h-fit my-auto">
+            <img src="{{ a.photo.url }}" alt="" class="">
+        </div>
+        {% endif %}
+    </a>
+    <div class="flex justify-between">
+        <div>
+            {% if a.rating > 0.0 %}
+            <div class="flex space-x-1">
+                <img src="{% static 'svg/star.svg' %}" alt="" class="w-5">
+                <p class="font-light text-sm"> - {{a.rating}} </p>
+            </div>
+            {% endif %}
+        </div>
+        <a href="{% url 'articles:detail_article' a.pk %}" class="flex items-center space-x-1 hover:scale-105">
+            <img src="{% static 'svg/comment.svg' %}" class="w-4">
+            <p class="text-sm text-gray-400">
+                {{a.comments.count}}
+            </p>
+        </a>
+    </div>
+</div>

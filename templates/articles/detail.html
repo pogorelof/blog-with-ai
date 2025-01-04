@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% load template_filters %}
+{% block title %}Detail{% endblock title %}
+{% block main %}
+
+<div class="grid grid-cols-2 m-5 gap-2">
+    <!-- left panel -->
+    <div class="grid grid-rows-3 h-[calc(100vh-5rem)]">
+        <!-- top panel -->
+        {% include "includes/article_cards/article_for_detail.html" %}
+
+        <!-- bottom panel -->
+        <div class="row-span-2 space-y-3 flex flex-col justify-between">
+            <p class="text-xl font-medium">Комментарии</p>
+            <div class="space-y-2 overflow-scroll no-scrollbar">
+                {% if obj.comments.exists %}
+                {% for c in obj.comments.all %}
+                {% include "includes/comment.html" %}
+                {% endfor %}
+                {% else %}
+                <p class="text-center text-gray-300 opacity-50">БУДЬТЕ ПЕРВЫМИ КТО ОСТАВИТ КОММЕНТАРИЙ</p>
+                {% endif %}
+            </div>
+            <form action="{% url 'articles:create_comment' obj.pk %}" method="post"
+                class="space-y-1 text-center flex flex-col justify-center items-center rounded-xl mx-auto p-3 w-full">
+                {% csrf_token %}
+                <p class="w-full">{{form.body}}</p>
+                <div class="w-full">
+                    <button type="submit"
+                        class="bg-white text-black p-1 rounded hover:scale-95 w-full">Написать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- right panel -->
+    <div class="h-[calc(100vh-6rem)]">
+
+        <div class="flex justify-between items-center text-black bg-white rounded-lg p-3">
+            <div>
+                {% if obj.author.photo %}
+                <div class="rounded-lg overflow-hidden w-10 h-10"><img src="{{obj.author.photo.url}}"
+                        class="w-full h-full object-cover"></div>
+                {% endif %}
+            </div>
+            <p>{{ obj.author.username }}</p>
+            <p class="text-sm text-gray-400 opacity-70">
+                {{obj.author.last_activity}}
+            </p>
+        </div>
+
+        <div class="space-y-3 overflow-scroll no-scrollbar h-[calc(100vh-10rem)]">
+            {% if obj.author.articles.exists %}
+            <p class="font-light mt-2">СООБЩЕНИЯ ПОЛЬЗОВАТЕЛЯ</p>
+            {% for a in obj.author.articles.all %}
+            {% include "includes/article_cards/article_for_panel.html" %}
+            {% endfor %}
+            {% else %}
+            <p class="text-center text-gray-300 opacity-50 mt-10">ПОЛЬЗОВАТЕЛЬ НИЧЕГО НЕ ПИСАЛ</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock main %}

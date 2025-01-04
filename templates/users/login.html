@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Логин{% endblock title %}
+{% block main %}
+<form method="post" class="bg-white rounded-lg p-3 m-3 w-8/12 mx-auto text-black space-y-2">
+    <p class="text-xl font-medium text-center">Логин</p>
+    {% csrf_token %}
+    {{form.as_p}}
+    <div class="text-center">
+        <button class="bg-black hover:bg-gray-800 hover:scale-95 text-white rounded p-2">Войти</button>
+    </div>
+    <a href="{% url 'users:register' %}" class="text-sm hover:text-gray-700">Регистрация</a>
+</form>
+{% endblock main %}

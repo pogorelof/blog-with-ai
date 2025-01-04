@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% load template_filters %}
+{% block title %}Подписки{% endblock title %}
+{% block main %}
+
+<div class="grid grid-cols-10 gap-5 h-[calc(100vh-4rem)]">
+    <div class="col-span-2 border-r-2 border-white">
+
+        <div class="text-center flex items-start justify-center">
+            <button id='summarize' class="rounded-full p-2 font-light active:scale-95
+            bg-gradient-to-r from-red-700 via-purple-500 to-purple-700
+            bg-[length:400%_400%] 
+            transition-all 
+            duration-1000
+            ease-in-out
+            hover:gradient-animation
+            ">
+                Кратко о дне
+            </button>
+            <p class="text-xs text-gray-400">
+                AI Powered
+            </p>
+        </div>
+
+        <p class="m-3 ml-10 font-medium">Подписки</p>
+        <div class="overflow-scroll p-5 space-y-3 h-[calc(100vh-10rem)] no-scrollbar">
+            {% for u in subscriptions %}
+            <div class="flex items-center justify-between">
+                <a href="{% url 'users:profile' u.subscribed_to.pk %}"
+                    class="flex items-center justify-between space-x-4">
+                    <div class="w-8 h-8 overflow-hidden rounded-xl">
+                        <img src="{{ u.subscribed_to.photo.url }}" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-thin">{{ u.subscribed_to.username }}</p>
+                </a>
+                <a href="{% url 'users:unsubscribe' u.subscribed_to.pk %}"
+                    class="bg-white rounded-lg p-1 hover:scale-105 hover:bg-gray-300">
+                    <img src="{% static 'svg/cross.svg' %}" class="w-4">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-span-8 space-y-3 p-5 h-[calc(100vh-4rem)] no-scrollbar overflow-scroll">
+        {% for obj in articles %}
+        {% include 'includes/article_cards/article_for_index.html' %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- summarize window -->
+<div id="window" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-5 rounded-xl font-normal
+bg-gradient-to-r from-red-800 via-purple-600 to-purple-800
+max-h-[calc(100vh-2rem)]
+overflow-scroll no-scrollbar
+">
+    <button id="close" class="hover:text-red-300 w-fit absolute right-3 top-1">x</button>
+    <p id="text">
+    <div id="loading" class="hidden w-5 h-5 whitespace-normal">
+        <p class="text-white animate-spin text-xl">.</p>
+    </div>
+    </p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#close').on('click', function () {
+            $('#window').addClass('hidden')
+        })
+        $('#summarize').on('click', function () {
+            $('#window').removeClass('hidden')
+
+            $.ajax({
+                url: '{% url "ai:sum_subs" %}',
+                dataType: 'json',
+                success: function(response){
+                    $('#loading').addClass('hidden')
+                    $('#text').html(response.text)
+                },
+                beforeSend: function(){
+                    $('#loading').removeClass('hidden')
+                },
+                error: function(){
+                    $('#loading').addClass('hidden')
+                    $('#text').html('Ошибка')
+                }
+            }) 
+
+        })
+    })
+</script>
+
+{% endblock %}
+

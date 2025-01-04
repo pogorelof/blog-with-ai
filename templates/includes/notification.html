@@ -1,0 +1,39 @@
+{% load static %}
+<div>
+    <button id="noty-button" class="bg-white hover:scale-95 hover:bg-gray-200 text-black p-2 rounded-full">
+        {% if is_new %}
+            <img src="{% static 'svg/new_not.svg' %}" alt="" class="w-5 h-5">
+        {% else %}
+            <img src="{% static 'svg/not.svg' %}" alt="" class="w-5 h-5">
+        {% endif %} 
+    </button>
+    <div id="noty-list" class="hidden absolute bg-stone-200 p-3 m-3 w-1/4 right-0 z-10 rounded space-y-1 overflow-scroll max-h-[calc(100vh-20rem)] no-scrollbar">
+        {% if is_new %}
+        <a href="{% url 'notifications:mark_as_read' %}" class="block text-center w-full rounded bg-gray-900 hover:bg-gray-600 hover:scale-95">Пометить как прочитанное</a>
+        {% endif %}
+        {% if notifications.exists %}
+        {% for notification in notifications %}
+            <div class="{% if notification.is_read %}bg-gray-500 {% else %} bg-black {% endif %} p-2 rounded-lg text-sm font-serif">
+            {{ notification.message }}
+            </div>
+        {% endfor %}
+    	{% else %}
+        <p class="text-center text-gray-700 opacity-50">УВЕДОМЛЕНИЙ НЕТ</p>
+    {% endif %} 
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function (){
+        $('#noty-button').on('click', function (){
+            $('#noty-list').removeClass('hidden')
+        })
+        
+        $(document).on('click', function (e){
+            if(!$(e.target).closest('#noty-list, #noty-button').length){
+                $('#noty-list').addClass('hidden')
+            }
+        })
+    })
+</script>

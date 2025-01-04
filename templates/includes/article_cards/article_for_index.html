@@ -1,0 +1,58 @@
+{% load static %}
+{% load template_filters %}
+<div class="relative bg-white rounded-lg text-black p-3">
+    {% if user == obj.author %}
+    <a href="{% url 'articles:delete_article' obj.pk %}"
+        class="absolute right-0 top-0 bg-black hover:bg-red-700 hover:scale-95 cursor-pointer rounded-xl p-1 m-1">
+        <img src="{% static 'svg/trash.svg' %}" class="w-5">
+    </a>
+    {% endif %}
+
+    <a href='{% url 'users:profile' obj.author.pk %}' class="flex items-center space-x-1">
+        {% if obj.author.photo %}
+        <div class="rounded-lg overflow-hidden w-6 h-6"><img src="{{obj.author.photo.url}}"
+                class="w-full h-full object-cover"></div>
+        {% endif %}
+        <p class="text-sm font-light">{{obj.author.username}} - </p>
+        <p class="text-sm font-light">{{obj.upload_at|date:'d.m H:i'}}</p>
+    </a>
+
+    <a href="{% url 'articles:detail_article' obj.pk %}"
+        class="block m-3 {% if obj.photo %} gridgrid-cols-2 {% endif %} gap-3 space-y-2">
+        <p>{{obj.body}}</p>
+        {% if obj.photo %}
+        <div class="rounded-xl overflow-hidden h-fit my-auto">
+            <img src="{{ obj.photo.url }}" alt="" class="">
+        </div>
+        {% endif %}
+    </a>
+
+    <div class="flex justify-between">
+
+        <div class="flex space-x-1">
+            {% with pk=user_rating|get_item:obj.pk %}
+            <a href="{% url 'articles:rate_article' pk=obj.pk star=1 %}"><img src="{% static 'svg/star.svg' %}" alt=""
+                    class="w-5 {% if pk >= 1.0 %} opacity-100 {% else %} opacity-40 {% endif %} hover:scale-125"></a>
+            <a href="{% url 'articles:rate_article' pk=obj.pk star=2 %}"><img src="{% static 'svg/star.svg' %}" alt=""
+                    class="w-5 {% if pk >= 2.0 %} opacity-100 {% else %} opacity-40 {% endif %} hover:scale-125"></a>
+            <a href="{% url 'articles:rate_article' pk=obj.pk star=3 %}"><img src="{% static 'svg/star.svg' %}" alt=""
+                    class="w-5 {% if pk >= 3.0 %} opacity-100 {% else %} opacity-40 {% endif %} hover:scale-125"></a>
+            <a href="{% url 'articles:rate_article' pk=obj.pk star=4 %}"><img src="{% static 'svg/star.svg' %}" alt=""
+                    class="w-5 {% if pk >= 4.0 %} opacity-100 {% else %} opacity-40 {% endif %} hover:scale-125"></a>
+            <a href="{% url 'articles:rate_article' pk=obj.pk star=5 %}"><img src="{% static 'svg/star.svg' %}" alt=""
+                    class="w-5 {% if pk > 4.5 %} opacity-100 {% else %} opacity-40 {% endif %} hover:scale-125"></a>
+            {% endwith %}
+
+            {% if obj.rating > 0.0 %}
+            <p class="font-light text-sm"> - {{obj.rating}} </p>
+            {% endif %}
+        </div>
+        
+        <a href="{% url 'articles:detail_article' obj.pk %}" class="flex items-center space-x-1 hover:scale-105">
+            <img src="{% static 'svg/comment.svg' %}" class="w-4">
+            <p class="text-sm text-gray-400">
+                {{obj.comments.count}}
+            </p>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="bg-white rounded-lg text-black p-3">
+    <a href='{% url 'users:profile' obj.author.pk %}' class="flex items-center space-x-1">
+        {% if c.user.photo %}
+        <div class="rounded-lg overflow-hidden w-6 h-6"><img src="{{c.user.photo.url}}"
+                class="w-full h-full object-cover"></div>
+        {% endif %}
+        <p class="text-sm font-light">{{c.user.username}} - </p>
+        <p class="text-sm font-light">{{c.upload_at|date:'d.m H:i'}}</p>
+        </a>
+
+    <p>{{c}}</p>
+</div>
