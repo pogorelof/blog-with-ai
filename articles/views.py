@@ -52,6 +52,11 @@ class DetailArticle(LoginRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
 @login_required
+def write_page(request):
+    form = ArticleForm()
+    return render(request, 'articles/write.html', {'form': form})
+
+@login_required
 def create_comment(request, article):
     form = CommentForm(request.POST)
     if form.is_valid():

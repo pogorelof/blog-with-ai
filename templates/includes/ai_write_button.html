@@ -3,7 +3,7 @@
 <div>
     <a
             {% if perms.users.ai_write %}
-                href=""
+                href="{% url 'articles:write' %}"
             {% endif %}
         id="write_button"
         class="block {% if perms.users.ai_write %} bg-white hover:bg-purple-900  {% else %} bg-gray-400 hover:bg-red-900  {% endif %}hover:scale-95 hover:cursor-pointer text-black p-2 rounded-full">

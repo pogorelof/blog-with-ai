@@ -11,6 +11,25 @@ from .cache import Cache
 cache = Cache()
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
+
+def ai_request(system, user):
+    response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {'role':'system', 'content': system},
+        {'role':'user', 'content': user}
+    ],
+    response_format={
+        "type": "text"
+    },
+    temperature=1,
+    max_tokens=10000,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0
+    )
+    return response.choices[0].message.content.strip()
+
 @login_required
 def summarize_subscriptions(request):
     system = '''
@@ -43,20 +62,52 @@ def summarize_subscriptions(request):
     
     return JsonResponse({'text': text})
 
-def ai_request(system, user):
-    response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {'role':'system', 'content': system},
-        {'role':'user', 'content': user}
-    ],
-    response_format={
-        "type": "text"
-    },
-    temperature=1,
-    max_tokens=10000,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0
-    )
-    return response.choices[0].message.content.strip()
+@login_required()
+def tweet_plan(request):
+    system = '''
+    # Role
+    1. You make a plan for writing a tweet.
+    
+    # Audience
+    1. Internet audience of different ages.
+    
+    # Your task
+    1. Based on the topic, make a mini-plan for writing a tweet so that it is interesting and engaging.
+    
+    # Output
+    1. Output only the text separated by a dash ('-') for each stage of the plan
+    2. At the end of each line, insert <br>
+    3. The output must match the language in which the topic is written
+    
+    # Notes:
+    1. Hashtags are not needed!
+    '''
+    title = request.POST.get('title')
+    plan = ai_request(system, title)
+    return JsonResponse({'plan': plan})
+
+def make_text(request):
+    system = '''
+    # Role
+    1. You are a skilled writer who has a better command of words than anyone in the world.
+    
+    # Audience
+    1. A thinking internet audience who will not be satisfied with a meaningless post
+    
+    # Your task
+    1. In accordance with the plan and topic, write an exciting and creative text with a limit of 290 characters.
+    2. The text must be interesting and meaningful.
+    
+    # Output data
+    1. Output only the text
+    2. Limit of 290 characters
+    3. The output data must match the language in which the topic and plan are written
+    
+    # Notes:
+    1. Hashtags are not needed!
+    '''
+    title = request.GET.get('title')
+    plan = request.GET.get('plan')
+    user = f'Title: {title}, Plan: {plan}'
+    text = ai_request(system, user)
+    return JsonResponse({'text':text})

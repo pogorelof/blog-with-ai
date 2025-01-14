@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Написать {% endblock %}
+{% block main %}
+
+    <p class="text-center text-xl">Написать</p>
+    <div class="w-10/12 mx-auto">
+
+        <div>
+            <p class="text-center text-md">Опишите тему, о которой хотите написать</p>
+            <form action="" id="plan-form" class="text-black mx-auto w-fit">
+                {% csrf_token %}
+                <input id="input_title" type="text" class="rounded-xl p-2 w-96" name="title">
+                <button type="submit" class="bg-white rounded p-2 text-sm hover:bg-gray-200 hover:scale-95">Тема
+                </button>
+            </form>
+
+            <div id="plan-block" class="hidden">
+                <p class="text-center text-md">План по написанию</p>
+                <div id="plan" class="bg-gray-50 text-black w-full max-h-40 overflow-scroll rounded-lg p-2">
+                    <div id="loading" class="hidden w-5 h-5 whitespace-normal">
+                        <p class="text-white animate-spin text-xl">.</p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="make_text_button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm text-center rounded-sm p-1">Сгенерировать текст по
+                        плану
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <form action="{% url 'articles:create_article' %}" method="post" enctype="multipart/form-data"
+              class="text-center flex flex-col justify-center items-center rounded-xl mx-auto p-1 w-full">
+            {% csrf_token %}
+            <p class="w-full relative">{{ form.body }} <span id="charCount"
+                                                             class="absolute right-0 bottom-0 m-2 text-gray-500">300</span>
+            </p>
+            <div class="grid grid-cols-12 gap-2 w-full">
+                <button type="submit"
+                        class="bg-white text-black p-1 rounded hover:scale-95 w-full col-span-11">Написать
+                </button>
+                <label for="fileinput"
+                       class="rounded-3xl bg-blue-600 w-9 h-9 flex justify-center items-center hover:scale-95 hover:bg-blue-700 cursor-pointer">
+                    <img src="{% static 'svg/image.svg' %}" alt="" class="w-8">
+                    {{ form.photo }}
+                </label>
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var textarea = $('#textArea')
+            var maxLength = parseInt(textarea.attr('maxlength'))
+            var charCount = $('#charCount')
+            textarea.on('input', function () {
+                charCount.text(maxLength - $(this).val().length)
+            })
+
+            $('#plan-form').on('submit', function (event) {
+                event.preventDefault()
+                const formData = $(this).serialize()
+                const loadClass = 'bg-gray-400 h-40'
+
+                $.ajax({
+                    url: '{% url "ai:make_plan" %}',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('#loading').hide()
+                        $('#plan').removeClass(loadClass)
+                        $('#plan').html(response.plan)
+                    },
+                    beforeSend: function () {
+                        $('#plan-block').show()
+                        $('#plan').addClass(loadClass)
+                        $('#loading').show()
+                    },
+                    error: function () {
+                        $('#plan').addClass('bg-red-400 text-white opacity-90 flex justify-center items-center')
+                        $('#plan').html('Произошла ошибка запроса!')
+                    }
+                })
+            })
+            
+            $('#make_text_button').on('click', function () {
+                $.ajax({
+                    url: '{% url "ai:make_text" %}',
+                    dataType: 'json',
+                    type: 'GET',
+                    data: {
+                        title: $('#input_title').val(),
+                        plan: $('#plan').text()
+                    },
+                    success: function (response){
+                        $('#textArea').val(response.text)
+                        $('#textArea').removeClass('bg-gray-400')
+                        $('#textArea').prop('disabled', false)
+                    },
+                    beforeSend: function () {
+                        $('#textArea').addClass('bg-gray-400')
+                        $('#textArea').prop('disabled', true)
+                    },
+                    error: function () {
+                        $('#textArea').addClass('bg-red-600 text-white opacity-90')
+                        $('#textArea').val('Произошла ошибка запроса!')
+                    }
+                })
+            })
+        })
+
+    </script>
+{% endblock %}
