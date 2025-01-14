@@ -23,8 +23,8 @@
                     </div>
                 </div>
                 <div class="text-center">
-                    <button id="make_text_button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm text-center rounded-sm p-1">Сгенерировать текст по
-                        плану
+                    <button id="make_text_button" class="bg-gray-50 hover:bg-gray-200 text-black text-sm text-center rounded-sm p-1">
+                        Сгенерировать текст на основе ваших постов
                     </button>
                 </div>
             </div>
@@ -92,8 +92,7 @@
                     dataType: 'json',
                     type: 'GET',
                     data: {
-                        title: $('#input_title').val(),
-                        plan: $('#plan').text()
+                        title: $('#input_title').val()
                     },
                     success: function (response){
                         $('#textArea').val(response.text)
@@ -105,6 +104,7 @@
                         $('#textArea').prop('disabled', true)
                     },
                     error: function () {
+                        $('#textArea').removeClass('bg-gray-400')
                         $('#textArea').addClass('bg-red-600 text-white opacity-90')
                         $('#textArea').val('Произошла ошибка запроса!')
                     }

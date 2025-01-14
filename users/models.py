@@ -16,7 +16,7 @@ class User(AbstractUser):
         ]
 
     def has_access_to_ai_write(self):
-        if self.articles.count() > 10 and self.rating >= 4.0:
+        if self.articles.count() >= 10 and self.rating >= 4.0:
             return True
         return False
 
